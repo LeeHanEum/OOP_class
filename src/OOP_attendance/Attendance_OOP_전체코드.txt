@@ -1,0 +1,261 @@
+package OOP_attendance;
+
+import OOP_attendance.Controller.AttendanceController;
+
+public class AttendanceApplication {
+    public static void main(String[] args) {
+        System.out.println("교수용 출석체크 프로그램");
+        AttendanceController attendanceController = AttendanceController.getInstance();
+        attendanceController.run();
+    }
+}
+
+
+
+
+package OOP_attendance.Controller;
+
+import OOP_attendance.Entity.Professor;
+import OOP_attendance.Entity.Student;
+import OOP_attendance.Service.ProfessorService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class AttendanceController {
+    Scanner scanner = new Scanner(System.in);
+    private Professor professor = Professor.getInstance();
+    private List<Student> students = new ArrayList<>();
+    private final ProfessorService professorService = ProfessorService.getInstance();
+
+    private static AttendanceController instance;
+
+    public static AttendanceController getInstance() {
+        if (instance == null) {
+            instance = new AttendanceController();
+        }
+        return instance;
+    }
+
+    public void run() {
+
+        professor = professorService.login(scanner);
+        System.out.println(professor.getName() + " 교수님 환영합니다.");
+
+        if(professor.getId() == null){
+            System.out.println("로그인 실패");
+            return;
+        }
+
+        while(true){
+            System.out.println("(1) 학생 등록\n(2) 출석부 조회\n(3) 출석부 등록\n(0) 로그아웃 및 종료");
+            System.out.print("메뉴를 선택하세요 : ");
+            int menu = scanner.nextInt();
+            switch (menu) {
+                case 1:
+                    System.out.println("학생 등록");
+                    students = professorService.registerStudent(scanner, professor);
+                    break;
+                case 2:
+                    System.out.println("출석부 조회");
+                    professorService.print(students);
+                    break;
+                case 3:
+                    System.out.println("출석부 등록");
+                    professorService.registerAttendance(scanner, students);
+                    break;
+                case 0:
+                    System.out.println("로그아웃 및 종료");
+                    return;
+                default:
+                    System.out.println("잘못된 입력입니다.");
+                    break;
+            }
+            System.out.println();
+        }
+
+    }
+}
+
+
+
+package OOP_attendance.Service;
+
+import OOP_attendance.Entity.Professor;
+import OOP_attendance.Entity.Student;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class ProfessorService {
+
+    private static long sequence = 0L;
+
+    private static long studentSequence = 0L;
+
+    private static ProfessorService instance;
+
+    public static ProfessorService getInstance() {
+        if (instance == null) {
+            instance = new ProfessorService();
+        }
+        return instance;
+    }
+
+    public List<Student> registerStudent(Scanner scanner, Professor professor){
+        List<Student> students = new ArrayList<>();
+
+        System.out.println("학생 이름을 입력하세요.");
+        while (true){
+            String name = scanner.nextLine();
+            if(name.equals("0")){
+                break;
+            }
+            students.add(new Student(studentSequence++, name, professor));
+        }
+        return students;
+    }
+
+    private String attendanceCount(Student student){
+        int count = 0;
+        for(Boolean attendance : student.getAttendance()){
+            if(attendance){
+                count++;
+            }
+        }
+        return count + "/" + student.getAttendance().size();
+    }
+
+    public void print(List<Student> students){
+        for(Student student : students){
+            if(student.getId()==0) continue;
+            System.out.println("아이디:" + student.getId() + "\t이름:" + student.getName() + "\t담당교수:" + student.getProfessor().getName() + "\t출석횟수:" + attendanceCount(student));
+        }
+    }
+
+    public void registerAttendance(Scanner scanner, List<Student> students){
+        print(students);
+        System.out.print("출석을 등록할 학생의 아이디를 입력하세요 : ");
+        Long id = scanner.nextLong();
+        Student student = Student.getInstance().findById(students, id);
+
+        System.out.println(student.getName() + " 학생 출석부");
+        int i;
+        for (i = 1; i < student.getAttendance().size(); i++) {
+            System.out.println((i+1) + "주차 출석 여부 : " + student.getAttendance().get(i));
+        }
+        System.out.print(i+1 + "주차 출석 여부(출석:true, 결석:false) : ");
+        Boolean attendance = scanner.nextBoolean();
+        student.getAttendance().add(attendance);
+    }
+
+    public Professor login(Scanner scanner) {
+
+        System.out.println("교수자 로그인");
+        System.out.print("이름을 입력하세요 : ");
+        String name = scanner.next();
+
+        return new Professor(++sequence, name);
+    }
+}
+
+
+
+
+package OOP_attendance.Entity;
+
+public class Professor {
+
+    private Long id;
+
+    private String name;
+
+    private static Professor instance;
+
+    public static Professor getInstance() {
+        if (instance == null) {
+            instance = new Professor();
+        }
+        return instance;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Professor() {
+    }
+
+    public Professor(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+}
+
+
+
+
+package OOP_attendance.Entity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Student {
+
+    private Long id;
+
+    private String name;
+
+    private List<Boolean> attendance = new ArrayList<>();
+
+    private Professor professor;
+
+    private static Student instance;
+
+    public static Student getInstance() {
+        if (instance == null) {
+            instance = new Student();
+        }
+        return instance;
+    }
+
+    public Student findById(List<Student> students, Long id){
+        for(Student student : students){
+            if(student.getId().equals(id)){
+                return student;
+            }
+        }
+        return null;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Boolean> getAttendance() {
+        return attendance;
+    }
+
+    public Professor getProfessor() {
+        return professor;
+    }
+
+    public Student() {
+    }
+
+    public Student(Long id, String name, Professor professor) {
+        this.id = id;
+        this.name = name;
+        this.professor = professor;
+    }
+}

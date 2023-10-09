@@ -1,0 +1,277 @@
+package OOP_todoList;
+
+import OOP_todoList.Controller.TodoController;
+
+public class TodoListApplication {
+
+    public static void main(String[] args) {
+        System.out.println("투두리스트 프로그램 시작");
+        TodoController todoController = TodoController.getInstance();
+        assert todoController != null;
+        todoController.run();
+    }
+}
+
+
+
+package OOP_todoList.Controller;
+
+import OOP_todoList.Entity.Todo;
+import OOP_todoList.Service.TodoService;
+
+import java.util.Scanner;
+
+public class TodoController {
+
+    private final TodoService todoService;
+
+    private static TodoController instance;
+
+    Scanner scanner = new Scanner(System.in);
+
+    public TodoController(){
+        todoService = TodoService.getInstance();
+    }
+
+    public static TodoController getInstance() {
+        if (instance == null) {
+            instance = new TodoController();
+        }
+        return instance;
+    }
+
+    public void run() {
+
+        while(true){
+            int menu = showMenu();
+            switch (menu){
+                case 1 :
+                    todoService.readTodoList();
+                    break;
+                case 2 :
+                    System.out.println("할 일을 입력해주세요.");
+                    String text = scanner.nextLine();
+                    todoService.createTodoList(text);
+                    break;
+                case 3 :
+                    System.out.println("삭제할 할 일의 번호를 입력해주세요.");
+                    todoService.readTodoList();
+                    todoService.deleteTodoList((long) scanner.nextInt());
+                    break;
+                case 4 :
+                    System.out.println("수정할 할 일의 번호를 입력해주세요.");
+                    todoService.readTodoList();
+                    Todo todo = todoService.findOneTodo((long) scanner.nextInt());
+                    System.out.println("완료로 수정하시겠습니까? (완료: true, 미완료: false)");
+                    todoService.updateTodoList(todo, scanner.nextBoolean());
+                    break;
+                case 5 :
+                    System.out.println("투두리스트 프로그램 종료");
+                    return;
+                default:
+                    System.out.println("잘못된 입력입니다.");
+            }
+
+        }
+    }
+
+    public int showMenu(){
+
+        System.out.println("-----------------------------------");
+        System.out.println("1. 투두 리스트 보기");
+        System.out.println("2. 투두 리스트 추가");
+        System.out.println("3. 투두 리스트 삭제");
+        System.out.println("4. 투두 리스트 수정");
+        System.out.println("5. 투두 리스트 종료");
+        System.out.println();
+
+        System.out.print("메뉴를 선택하세요: ");
+        int menu = scanner.nextInt();
+        scanner.nextLine();
+        System.out.println();
+
+        return menu;
+    }
+
+}
+
+
+
+package OOP_todoList.Service;
+
+import OOP_todoList.Entity.Todo;
+import OOP_todoList.Repository.TodoMemoryRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+public class TodoService {
+
+    private final TodoMemoryRepository todoMemoryRepository;
+
+    private static TodoService instance;
+
+    public TodoService() {
+        todoMemoryRepository = TodoMemoryRepository.getInstance();
+    }
+
+    public static TodoService getInstance() {
+        if(instance == null) {
+            instance = new TodoService();
+        }
+        return instance;
+    }
+
+    public void readTodoList() {
+        try {
+            List<Todo> todoList = todoMemoryRepository.findAll();
+            if(todoList.size() == 0) {
+                System.out.println("할 일이 없습니다.");
+                return;
+            }
+            for (Todo todo : todoList) {
+                System.out.println(todo.getId() + ". " + todo.getText() + " (" + todo.getDone() + ")");
+            }
+
+        } catch (Exception e) {
+            System.out.println("불러오는데 실패했습니다.");
+        }
+    }
+
+    public Todo findOneTodo(Long id) {
+        Optional<Todo> optionalTodo = todoMemoryRepository.findById(id);
+
+        if(!optionalTodo.isPresent()) {
+            System.out.println("존재하지 않는 할 일입니다.");
+            return null;
+        }
+        return optionalTodo.get();
+    }
+
+    public void createTodoList(String text) {
+
+        Todo todo = new Todo(text, false);
+        try {
+            todoMemoryRepository.save(todo);
+            System.out.println(todo.getText() + " 이(가) 저장되었습니다.");
+        } catch (Exception e) {
+            System.out.println("저장하는데 실패했습니다.");
+        }
+    }
+
+    public void updateTodoList(Todo todo, boolean status) {
+
+        todo.setDone(status);
+        try {
+            todoMemoryRepository.save(todo);
+        }catch (Exception e) {
+            System.out.println("수정하는데 실패했습니다.");
+        }
+        System.out.println(todo.getText() + " 이(가)" + todo.getDone() + "로 수정되었습니다.");
+    }
+
+    public void deleteTodoList(Long id) {
+
+        Optional<Todo> optionalTodo = todoMemoryRepository.findById(id);
+
+        if(!optionalTodo.isPresent()) {
+            System.out.println("존재하지 않는 할 일입니다.");
+            return;
+        }
+
+        todoMemoryRepository.delete(id);
+        System.out.println(optionalTodo.get().getText() + " 이(가) 삭제되었습니다.");
+
+        List<Todo> todoList = todoMemoryRepository.findAll();
+        for (Todo todo : todoList) {
+            if(todo.getId() > id) {
+                todo.setId(todo.getId() - 1);
+            }
+        }
+
+    }
+}
+
+
+
+package OOP_todoList.Repository;
+
+import OOP_todoList.Entity.Todo;
+
+import java.util.*;
+
+public class TodoMemoryRepository {
+
+    private static Map<Long, Todo> store = new HashMap<>();
+
+    private static TodoMemoryRepository instance;
+
+    private static long sequence = 0L;
+
+    public static TodoMemoryRepository getInstance() {
+        if(instance == null) {
+            instance = new TodoMemoryRepository();
+        }
+        return instance;
+    }
+
+    public Todo save(Todo todo) {
+
+        if(store.containsKey(todo.getId())) {
+            store.replace(todo.getId(), todo);
+            return todo;
+        }
+        todo.setId(++sequence);
+        store.put(todo.getId(), todo);
+        return todo;
+    }
+
+    public List<Todo> findAll() {
+        return new ArrayList<>(store.values());
+    }
+
+    public Optional<Todo> findById(Long id) {
+        return Optional.ofNullable(store.get(id));
+    }
+
+    public void delete(Long id) {
+        store.remove(id);
+    }
+
+}
+
+
+
+package OOP_todoList.Entity;
+
+public class Todo {
+
+    private Long id;
+    private String text;
+    private boolean done;
+
+    public Todo (String text, boolean done) {
+        this.text = text;
+        this.done = done;
+    }
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+    public boolean getDone() {
+        return done;
+    }
+    public void setDone(boolean done) {
+        this.done = done;
+    }
+}
