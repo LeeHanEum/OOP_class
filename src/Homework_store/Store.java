@@ -51,7 +51,7 @@ public class Store {
                 case 1: searchAll(itemList); break;
                 case 2: searchAll(userList); break;
                 case 3: searchAll(orderList); break;
-                case 4: searchAll(); break;
+                case 4: searchAllByCondition(); break;
                 case 0 : return;
                 default: break;
             }
@@ -119,7 +119,7 @@ public class Store {
             }
         }
     }
-    public void searchAll(){
+    public void searchAllByCondition(){
         while(true) {
             System.out.println("조건 검색할 요소를 선택하세요.");
             System.out.println("(1)구매총액 (2)구매횟수 (3)포인트 (0)종료");
@@ -130,17 +130,18 @@ public class Store {
                 case 2 : type = "count"; break;
                 case 3 : type = "point"; break;
                 case 0 : return;
+                default: break;
             }
             System.out.println("조건값을 입력하고 up 또는 down을 입력하세요. (예 : 100 up) >> ");
             int value = scan.nextInt();
             String updown = scan.next();
             switch (updown) {
-                case "up" : searchAll(type, value, true); break;
-                case "down" : searchAll(type, value, false); break;
+                case "up" : printByCondition(type, value, true); break;
+                case "down" : printByCondition(type, value, false); break;
             }
         }
     }
-    public void searchAll(String type, int value, Boolean bool){
+    public void printByCondition(String type, int value, Boolean bool){
         for (Manageable m: userList) {
             User user = (User)m;
             switch (type) {
@@ -155,10 +156,10 @@ public class Store {
                     break;
                 case "count":
                     if (bool) {
-                        if (user.getCount() > value)
+                        if (user.myOrder.size() > value)
                             user.print();
                     } else {
-                        if (user.getCount() < value)
+                        if (user.myOrder.size() < value)
                             user.print();
                     }
                     break;

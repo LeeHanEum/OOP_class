@@ -36,15 +36,17 @@ public class Order implements Manageable{
             OrderItem orderItem = new OrderItem();
             orderItem.item = (Item)Store.findByKwd(Store.itemList, code);
             orderItem.read(scanner);
-            user.basket.add(orderItem);
             orderItemList.add(orderItem);
         }
         calcTotal();
         calcPoint();
+        user.myOrder.add(this);
     }
 
     @Override
     public boolean matches(String kwd) {
+        if (String.valueOf(orderId).equals(kwd))
+            return true;
         if (user.id.equals(kwd))
             return true;
         if (date.contains(kwd))
