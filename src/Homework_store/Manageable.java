@@ -1,6 +1,5 @@
-package ItemStore_week5;
+package Homework_store;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public interface Manageable {

@@ -7,7 +7,9 @@ public class User implements Manageable{
     String id;
     String pwd;
     int point;
+
     ArrayList<Manageable> basket = new ArrayList<>();
+
 
     public void read(Scanner scan) {
         id = scan.next();
