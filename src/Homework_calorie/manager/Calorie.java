@@ -10,6 +10,6 @@ public interface Calorie {
 
     void read(Scanner scan);
 
-    int getKcal();
+    double getKcal(int n);
 
 }

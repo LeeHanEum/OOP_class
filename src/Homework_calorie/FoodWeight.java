@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class FoodWeight extends Food {
 
-    int weight;
+    double weight;
     String wUnit;
 
     @Override
@@ -18,16 +18,27 @@ public class FoodWeight extends Food {
 
     @Override
     public String toString() {
-        return String.format("[%2d] %s-%s (%dkcal/%s) %d%s", id, type, name, cal, unit, weight, wUnit);
+        return String.format("[%2d] %s-%s (%dkcal/%s) %f%s", id, type, name, (int)cal, unit, weight, wUnit);
     }
 
     @Override
-    public int getKcal() {
-        return super.getKcal() / weight;
+    public double getKcal(int n) {
+        if (weight == n*weight) {
+            return cal;
+        }else{
+            return cal/weight;
+        }
     }
 
     @Override
-    String getDetail(int n, String unit) {
-        return super.getDetail(n, unit);
+    public String getDetail(int n, String unit) {
+        if (weight == n*weight){
+            return super.getDetail(n, unit);
+        }else {
+               return super.getDetail(n, unit)
+                       + String.format("-> %dKcal*%d/%d%s = %dkcal", (int)cal, n, (int)weight, wUnit, (int)(cal*n/weight));
+
+        }
     }
+
 }

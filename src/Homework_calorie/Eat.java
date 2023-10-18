@@ -10,12 +10,12 @@ public class Eat implements Calorie{
 	Food food;
 	int quantity;
 	String unit;
-	int kcal;
+	double kcal;
 
 	@Override
 	public String toString() {
 		return String.format("%s %d%s(%dkcal) - %s",
-				food.name, quantity, unit, kcal, food.getDetail(quantity, unit));
+				food.name, quantity, unit, (int)food.cal, food.getDetail(quantity, unit));
 	}
 	@Override
 	public Calorie create(Scanner scanner) {
@@ -26,15 +26,14 @@ public class Eat implements Calorie{
 	public void read(Scanner scan) {
 		String name = scan.next();
 		food = (Food)CalorieMgr.foodMgr.find(name);
-		if (food == null)
-			return;
 		quantity = scan.nextInt();
-		kcal = getKcal();
+		kcal = food.cal;
 		unit = scan.next();
 	}
 
 	@Override
-	public int getKcal() {
-		return food.getKcal() * quantity;
+	public double getKcal(int n) {
+		return food.getKcal(quantity)*quantity;
 	}
+
 }

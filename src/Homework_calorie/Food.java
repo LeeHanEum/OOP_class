@@ -10,7 +10,7 @@ public class Food implements Calorie {
 	String type;
 	String name;
 	String unit;
-	int cal;
+	double cal;
 
 	@Override
 	public Calorie create(Scanner scanner) {
@@ -35,13 +35,15 @@ public class Food implements Calorie {
 	}
 	@Override
 	public String toString() {
-		return String.format("[%2d] %s-%s (%dkcal/%s)", id, type, name, cal, unit);
+		return String.format("[%2d] %s-%s (%dkcal/%s)", id, type, name, (int)cal, unit);
 	}
 	@Override
-	public int getKcal() {
+	public double getKcal(int n) {
 		return cal;
 	}
 	String getDetail(int n, String unit) {
-		return String.format("%dkcal/%d%s", cal, 1, this.unit);
+		return String.format("%dkcal/%d%s", (int)cal, 1, this.unit);
 	}
+
+
 }

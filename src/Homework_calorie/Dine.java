@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class Dine extends Manager implements Calorie {
 
-	static Manager eatMgr = new Manager();
+	Manager eatMgr = new Manager();
 
 	int month;
 	int day;
@@ -26,20 +26,16 @@ public class Dine extends Manager implements Calorie {
 		this.eatType = scan.next();
 		int cc = scan.nextInt();
 
-		eatMgr.readAll("src/Homework_calorie/input/eats_input.txt", new Eat());
-	}
-
-	public void print() {
-		System.out.printf("%d/%d %s ", month, day, eatType);
-		System.out.printf("총칼로리: %dkcal\n", totalCal);
-		for (Calorie c : eatMgr.cList) {
-			System.out.println(c);
+		for (int i = 0; i < cc; i++) {
+			Eat eat = new Eat();
+			eat.read(scan);
+			eatMgr.cList.add(eat);
 		}
 	}
 
 	@Override
 	public String toString() {
-		String result = String.format("%d/%d %s 총칼로리: %dkcal\n", month, day, eatType, totalCal);
+		String result = String.format("%d/%d %s 총칼로리: %dkcal\n", month, day, eatType, (int)getKcal(1));
 
 		for (Calorie c : eatMgr.cList) {
 			result += c.toString() + "\n";
@@ -48,10 +44,13 @@ public class Dine extends Manager implements Calorie {
 		return result;
 	}
 
-
 	@Override
-	public int getKcal() {
+	public double getKcal(int n) {
+		for (Calorie c : eatMgr.cList) {
+			totalCal += c.getKcal(n);
+		}
 		return totalCal;
 	}
+
 
 }

@@ -1,11 +1,5 @@
 package Homework_calorie.manager;
 
-
-import Homework_calorie.CalorieMgr;
-import Homework_calorie.Dine;
-import Homework_calorie.Food;
-import Homework_calorie.FoodWeight;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
