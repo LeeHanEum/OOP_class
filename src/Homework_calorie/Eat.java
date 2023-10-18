@@ -18,7 +18,7 @@ public class Eat implements Calorie{
 				food.name, quantity, unit, kcal, food.getDetail(quantity, unit));
 	}
 	@Override
-	public Calorie create() {
+	public Calorie create(Scanner scanner) {
 		return new Eat();
 	}
 
@@ -26,6 +26,8 @@ public class Eat implements Calorie{
 	public void read(Scanner scan) {
 		String name = scan.next();
 		food = (Food)CalorieMgr.foodMgr.find(name);
+		if (food == null)
+			return;
 		quantity = scan.nextInt();
 		kcal = getKcal();
 		unit = scan.next();

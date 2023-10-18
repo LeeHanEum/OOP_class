@@ -13,10 +13,10 @@ public class CalorieMgr extends Manager {
     }
 
     void run() {
-        foodMgr.readAll("src/Homework_calorie/input/food.txt");
+        foodMgr.readAll("src/Homework_calorie/input/food.txt", new Food());
         foodMgr.printAll();
         System.out.println();
-        dineMgr.readAll("src/Homework_calorie/input/eats_input.txt");
+        dineMgr.readAll("src/Homework_calorie/input/eats_input.txt", new Dine());
         dineMgr.printAll();
     }
 

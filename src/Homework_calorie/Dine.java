@@ -14,28 +14,19 @@ public class Dine extends Manager implements Calorie {
 	String eatType;
 	int totalCal;
 
-	public Dine(int month) {
-		this.month = month;
-	}
-
 	@Override
-	public Calorie create() {
-		return new Dine(month);
+	public Calorie create(Scanner scanner) {
+		return new Dine();
 	}
 
 	@Override
 	public void read(Scanner scan) {
+		this.month = scan.nextInt();
 		this.day = scan.nextInt();
 		this.eatType = scan.next();
-
 		int cc = scan.nextInt();
-		Eat eat;
-		for (int i = 0; i < cc; i++) {
-			eat = new Eat();
-			eat.read(scan);
-			eatMgr.cList.add(eat);
-			totalCal += eat.getKcal();
-		}
+
+		eatMgr.readAll("src/Homework_calorie/input/eats_input.txt", new Eat());
 	}
 
 	public void print() {

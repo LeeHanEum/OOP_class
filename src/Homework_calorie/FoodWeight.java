@@ -4,7 +4,7 @@ import Homework_calorie.manager.Calorie;
 
 import java.util.Scanner;
 
-public class FoodWeight extends Food implements Calorie{
+public class FoodWeight extends Food {
 
     int weight;
     String wUnit;
@@ -14,11 +14,6 @@ public class FoodWeight extends Food implements Calorie{
         super.read(scan);
         this.weight = scan.nextInt();
         this.wUnit = scan.next();
-    }
-
-    @Override
-    public Calorie create() {
-        return new FoodWeight();
     }
 
     @Override

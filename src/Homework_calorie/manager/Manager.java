@@ -16,27 +16,21 @@ public class Manager {
     public ArrayList<Calorie> cList = new ArrayList<>();
 
     Scanner openFile(String filename) {
-        Scanner filein = null;
+        Scanner fileIn = null;
         try {
-            filein = new Scanner(new File(filename));
+            fileIn = new Scanner(new File(filename));
         } catch (IOException e)
         {
             System.out.println("파일 입력 오류");
             System.exit(0);
         }
-        return filein;
+        return fileIn;
     }
 
-    public void readAll(String fileName){
+    public void readAll(String fileName, Calorie calorie){
         Scanner fileIn = openFile(fileName);
         while (fileIn.hasNext()) {
-            Calorie calorie;
-            int type = fileIn.nextInt();
-            switch (type) {
-                case 1 : calorie = new Food(); break;
-                case 2 : calorie = new FoodWeight(); break;
-                default: calorie = new Dine(type); break;
-            }
+            calorie = calorie.create(fileIn);
             calorie.read(fileIn);
             cList.add(calorie);
         }

@@ -13,8 +13,16 @@ public class Food implements Calorie {
 	int cal;
 
 	@Override
-	public Calorie create() {
-		return new Food();
+	public Calorie create(Scanner scanner) {
+		int check = scanner.nextInt();
+		switch (check) {
+			case 1:
+				return new Food();
+			case 2:
+				return new FoodWeight();
+			default:
+				return null;
+		}
 	}
 
 	@Override

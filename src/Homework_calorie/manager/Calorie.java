@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public interface Calorie {
 
-    Calorie create();
+    Calorie create(Scanner scanner);
 
     void read(Scanner scan);
 
