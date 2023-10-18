@@ -18,7 +18,7 @@ public class FoodWeight extends Food {
 
     @Override
     public String toString() {
-        return String.format("[%2d] %s-%s (%dkcal/%s) %f%s", id, type, name, (int)cal, unit, weight, wUnit);
+        return String.format("[%2d] %s-%s (%dkcal/%s) %d%s", id, type, name, (int)cal, unit, (int)weight, wUnit);
     }
 
     @Override
